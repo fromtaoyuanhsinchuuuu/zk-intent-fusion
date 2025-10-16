@@ -1,80 +1,323 @@
-# 🏗 Scaffold-ETH 2
+# 🧩 ZK-Intent Fusion
 
 <h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
+  <a href="./STARTUP_GUIDE.md">Startup Guide</a> |
+  <a href="http://localhost:8787/docs">API Docs</a> |
+  <a href="./CONTRIBUTING.md">Contributing</a>
 </h4>
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+🚀 **ZK-Intent Fusion** is a decentralized intent-centric protocol that combines natural language processing, zero-knowledge proofs, solver auctions, and cross-chain execution to optimize user outcomes in DeFi.
 
-⚙️ Built using NextJS, RainbowKit, Foundry, Wagmi, Viem, and Typescript.
+Built for the **AlphaMax Hackathon**, this project demonstrates:
+- 🤖 **ASI Chat Integration**: Natural language intent parsing
+- 🔐 **Vincent/Lit Protocol**: Privacy-preserving access control
+- 🔗 **Avail Nexus**: Cross-chain intent execution
+- 🧮 **ZK Proofs (Noir)**: Privacy-preserving verification
+- 🏆 **Solver Auctions**: Competitive route optimization
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+## ⚡ Quick Start (2 Minutes)
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+### Automated Setup
 
-## Requirements
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd zk-intent-fusion
 
-Before you begin, you need to install the following tools:
+# Run the demo (deploys contracts, starts backend & frontend)
+./start-demo.sh
 
-- [Node (>= v20.18.3)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
-
-## Quickstart
-
-To get started with Scaffold-ETH 2, follow the steps below:
-
-1. Install dependencies if it was skipped in CLI:
-
-```
-cd my-dapp-example
-yarn install
+# Open browser and go to:
+# http://localhost:3000/zk-intent
 ```
 
-2. Run a local network in the first terminal:
+The script will:
+1. ✅ Start local blockchain (Anvil)
+2. ✅ Deploy SolverRegistry & IntentVerifier contracts
+3. ✅ Start Python solver backend (port 8787)
+4. ✅ Start Next.js frontend (port 3000)
+5. ✅ Configure all environment variables
 
-```
-yarn chain
-```
-
-This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/foundry/foundry.toml`.
-
-3. On a second terminal, deploy the test contract:
-
-```
-yarn deploy
+**Stop all services:**
+```bash
+./stop-demo.sh
 ```
 
-This command deploys a test smart contract to the local network. The contract is located in `packages/foundry/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/foundry/script` to deploy the contract to the network. You can also customize the deploy script.
+### Manual Setup
 
-4. On a third terminal, start your NextJS app:
+For detailed step-by-step instructions, see **[STARTUP_GUIDE.md](./STARTUP_GUIDE.md)**
+
+## 🏗️ Architecture
 
 ```
-yarn start
+┌──────────────────────────────────────────────────────────────────┐
+│                         USER INTERFACE                           │
+│  Next.js + Scaffold-ETH 2 + RainbowKit + Wagmi                  │
+│  - Natural language input                                        │
+│  - Wallet connection & signatures                                │
+│  - Real-time auction visualization                               │
+└───────────────────────────┬──────────────────────────────────────┘
+                            │
+                            ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                     SOLVER BACKEND (FastAPI)                     │
+│  - Intent Parser (ASI Chat simulation)                           │
+│  - Solver Agents (A: Morpho, B: Aave, C: Unqualified)          │
+│  - Auction Engine (selects optimal solver)                       │
+│  - Cross-chain Execution Simulator (Nexus)                       │
+│  - ZK Proof Generation (Noir)                                    │
+└───────────────────────────┬──────────────────────────────────────┘
+                            │
+                            ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                   SMART CONTRACTS (Solidity)                     │
+│  - SolverRegistry: Qualified solver whitelist                    │
+│  - IntentVerifier: Anti-replay + ZK verification anchor          │
+│  - Access Control: On-chain registry checks                      │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
+## 🎯 Demo Flow
 
-Run smart contract test with `yarn foundry:test`
+### 1. Parse Intent
+User enters natural language:
+```
+"Use all my stablecoins for 3 months, highest APY, tolerate 3% gas"
+```
 
-- Edit your smart contracts in `packages/foundry/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/foundry/script`
+System generates:
+- Structured Intent object
+- Encrypted with Lit Protocol access control
+- Intent commitment hash
 
+### 2. Solver Auction
+Three solvers compete:
+- ✅ **Solver A (Morpho)**: 13.2% APY, $15 gas → **WINNER**
+- ✅ **Solver B (Aave)**: 12.1% APY, $11 gas → Valid
+- ❌ **Solver C (Unqualified)**: Not in registry → **REJECTED**
 
-## Documentation
+Auction selects winner based on user strategy (highest APY).
 
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
+### 3. Authorization
+- User authorizes winner via Vincent/Lit Protocol
+- Access control enforced (only qualified solvers can decrypt)
+- Winner gets execution permission
 
-To know more about its features, check out our [website](https://scaffoldeth.io).
+### 4. Execution
+Winner executes via Avail Nexus:
+1. Bridge USDC from Arbitrum → Optimism
+2. Bridge USDT from Polygon → Optimism  
+3. Swap USDT → USDC
+4. Supply to Morpho protocol
 
-## Contributing to Scaffold-ETH 2
+Final position: **~499.5 USDC on Morpho/Optimism at 13.2% APY**
 
-We welcome contributions to Scaffold-ETH 2!
+### 5. Verification
+- ZK proof generated and submitted
+- IntentVerifier contract records commitment
+- Anti-replay protection enforced
+- On-chain event emitted
 
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+## 📁 Project Structure
+
+```
+zk-intent-fusion/
+├── packages/
+│   ├── foundry/                    # Smart contracts (Solidity)
+│   │   ├── contracts/
+│   │   │   ├── IntentVerifier.sol  # Anti-replay + verification
+│   │   │   └── SolverRegistry.sol  # Qualified solver list
+│   │   ├── script/
+│   │   │   └── DeployIntentContracts.s.sol
+│   │   └── test/
+│   │
+│   ├── nextjs/                     # Frontend (Next.js)
+│   │   ├── app/
+│   │   │   ├── page.tsx            # Home
+│   │   │   └── zk-intent/
+│   │   │       └── page.tsx        # Main demo page
+│   │   ├── components/
+│   │   │   ├── IntentForm.tsx      # Natural language input
+│   │   │   ├── AuctionPanel.tsx    # Solver bids
+│   │   │   ├── ExecutionPanel.tsx  # Cross-chain execution
+│   │   │   └── ProofCard.tsx       # ZK verification
+│   │   └── lib/
+│   │       └── apiClient.ts        # Backend API client
+│   │
+│   └── solver/                     # Python backend (FastAPI)
+│       ├── src/
+│       │   ├── api/
+│       │   │   └── server.py       # Main API routes
+│       │   ├── agents/
+│       │   │   ├── solver_a_agent.py  # Morpho solver
+│       │   │   ├── solver_b_agent.py  # Aave solver
+│       │   │   └── solver_c_agent.py  # Unqualified solver
+│       │   ├── core/
+│       │   │   └── orchestration.py   # Auction engine
+│       │   ├── integrations/
+│       │   │   ├── lit.py          # Access control
+│       │   │   └── nexus.py        # Cross-chain execution
+│       │   └── zk/
+│       │       ├── circuits/       # Noir ZK circuits
+│       │       └── mock_prover.py  # Mock proof generation
+│       └── .env.example
+│
+├── start-demo.sh                   # Automated startup
+├── stop-demo.sh                    # Stop all services
+├── STARTUP_GUIDE.md                # Detailed setup guide
+└── README.md                       # This file
+```
+
+## 🔑 Key Features Implemented
+
+### ✅ Security & Access Control
+- **Anti-Replay Protection**: `intentProcessed` mapping prevents double-spending
+- **Qualified Solver Registry**: On-chain whitelist enforces access control
+- **State Management**: Separate tracking for intent processing, winner selection, execution
+- **Lit Protocol Integration**: Privacy-preserving access control (MVP uses hardcoded list)
+
+### ✅ Solver Auction
+- **Multi-Solver Competition**: 3 solvers (Morpho, Aave, Unqualified)
+- **Strategy-Based Selection**: Highest APY vs. Lowest Gas
+- **Access Control Demo**: Solver C always rejected (not in registry)
+- **Transparent Bidding**: All bids visible to user
+
+### ✅ Cross-Chain Execution
+- **Avail Nexus Simulation**: Multi-step cross-chain operations
+- **Asset Bridging**: USDC/USDT from Arbitrum/Polygon → Optimism
+- **Protocol Integration**: Morpho, Aave yield strategies
+- **Execution Tracking**: Real-time progress visualization
+
+### ✅ ZK Verification
+- **Noir Circuit Structure**: Poseidon hash ready (uses addition in MVP)
+- **Proof Generation**: Mock prover generates valid-looking proofs
+- **On-Chain Anchor**: IntentVerifier contract records commitments
+- **Verification Events**: On-chain events for auditability
+
+### ✅ User Experience
+- **Wallet Connection Required**: Uses RainbowKit + wagmi
+- **Natural Language Input**: Plain English intent parsing
+- **Real-Time Updates**: Live auction and execution status
+- **Progress Stepper**: Visual flow indicator
+- **Error Handling**: Loading states and error messages
+
+## 🧪 Testing
+
+### Run Smart Contract Tests
+```bash
+cd packages/foundry
+forge test
+```
+
+### Test Solver Backend
+```bash
+cd packages/solver
+python -m pytest tests/
+```
+
+### Manual API Testing
+```bash
+# Start backend first
+cd packages/solver
+python -m uvicorn src.api.server:app --port 8787
+
+# Test endpoints
+curl http://localhost:8787/
+curl -X POST http://localhost:8787/parse-intent \
+  -H "Content-Type: application/json" \
+  -d '{"intent": "Use all stablecoins for 3 months, highest APY"}'
+```
+
+## 🚨 Known Limitations (MVP)
+
+### Backend
+- ⚠️ State is in-memory (lost on restart)
+- ⚠️ ZK proofs are mocked (no real Noir proving)
+- ⚠️ Access control uses hardcoded list (not querying on-chain registry)
+- ⚠️ Cross-chain execution is simulated (not using Avail Nexus SDK)
+- ⚠️ ASI Chat is mocked (simple pattern matching)
+
+### Smart Contracts
+- ⚠️ No actual ZK verification (only records commitment)
+- ⚠️ Test solvers hardcoded in deployment script
+- ⚠️ No upgradeability (would need proxy pattern)
+
+### Frontend
+- ⚠️ Limited error handling in AuctionPanel/ExecutionPanel
+- ⚠️ No persistent transaction history
+- ⚠️ Assumes single-chain deployment (Anvil only)
+
+## 🛣️ Roadmap to Production
+
+### Phase 1: Core Components
+- [ ] Real Noir circuit with Poseidon hash
+- [ ] Query on-chain registry from Python backend
+- [ ] Integrate actual Lit Protocol SDK
+- [ ] Use real Avail Nexus SDK for bridging
+- [ ] Integrate ASI Chat API
+
+### Phase 2: Infrastructure
+- [ ] PostgreSQL database for state persistence
+- [ ] Redis for caching and rate limiting
+- [ ] Docker Compose for easy deployment
+- [ ] CI/CD pipeline (GitHub Actions)
+- [ ] Testnet deployment (Optimism Sepolia)
+
+### Phase 3: Advanced Features
+- [ ] Multi-chain support (Arbitrum, Base, Polygon)
+- [ ] Intent batching and aggregation
+- [ ] Solver reputation system
+- [ ] MEV protection
+- [ ] Advanced strategies (DCA, limit orders, etc.)
+
+### Phase 4: Production Hardening
+- [ ] Comprehensive test coverage (>90%)
+- [ ] Security audit (contracts + backend)
+- [ ] Load testing and optimization
+- [ ] Monitoring and alerting
+- [ ] User documentation and tutorials
+
+## 📖 Documentation
+
+- **[Startup Guide](./STARTUP_GUIDE.md)**: Complete setup and troubleshooting
+- **[API Documentation](http://localhost:8787/docs)**: FastAPI interactive docs
+- **[Contributing](./CONTRIBUTING.md)**: Guidelines for contributors
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see [LICENCE](./LICENCE) file for details.
+
+## 🙏 Acknowledgments
+
+Built with:
+- [Scaffold-ETH 2](https://scaffoldeth.io) - Ethereum development toolkit
+- [Foundry](https://getfoundry.sh) - Smart contract framework
+- [Next.js](https://nextjs.org) - React framework
+- [FastAPI](https://fastapi.tiangolo.com) - Python API framework
+- [Noir](https://noir-lang.org) - ZK circuit language
+
+Sponsored by AlphaMax Hackathon:
+- **Fetch.ai** (ASI Chat)
+- **Lit Protocol** (Vincent)
+- **Avail** (Nexus)
+
+---
+
+<div align="center">
+
+**Built for AlphaMax Hackathon 2025** 🚀
+
+[Report Bug](https://github.com/your-repo/issues) · [Request Feature](https://github.com/your-repo/issues)
+
+</div>

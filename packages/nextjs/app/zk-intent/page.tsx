@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import type { NextPage } from "next";
+import { useAccount } from "wagmi";
 import IntentForm from "~~/components/IntentForm";
 import AuctionPanel from "~~/components/AuctionPanel";
 import ExecutionPanel from "~~/components/ExecutionPanel";
 import ProofCard from "~~/components/ProofCard";
 import type { IntentResponse, ExecutionResponse } from "~~/lib/apiClient";
 
-const Home: NextPage = () => {
+const ZKIntentPage: NextPage = () => {
+  const { address, isConnected } = useAccount();
   const [intent, setIntent] = useState<IntentResponse | null>(null);
   const [authorized, setAuthorized] = useState(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResponse | null>(null);
@@ -18,6 +20,61 @@ const Home: NextPage = () => {
     setAuthorized(false);
     setExecutionResult(null);
   };
+
+  // Show wallet connection prompt if not connected
+  if (!isConnected) {
+    return (
+      <>
+        <div className="flex items-center flex-col grow pt-10">
+          <div className="px-5 max-w-5xl w-full">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                ZK-Intent Fusion
+              </h1>
+              <p className="text-xl opacity-70">
+                Cross-chain intent optimization with ZK proofs
+              </p>
+            </div>
+
+            {/* Connection Required */}
+            <div className="p-8 border-2 border-warning rounded-2xl bg-warning/10">
+              <div className="text-center space-y-4">
+                <div className="text-6xl">🔐</div>
+                <h2 className="text-2xl font-bold">Wallet Connection Required</h2>
+                <p className="text-lg opacity-70">
+                  Please connect your wallet to use ZK-Intent Fusion
+                </p>
+                <div className="text-sm opacity-60">
+                  You need to connect your wallet to:
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>Submit intents from your address</li>
+                    <li>Authorize solver execution</li>
+                    <li>Sign transactions for on-chain verification</li>
+                  </ul>
+                </div>
+                <div className="pt-4">
+                  <p className="text-xs opacity-50">
+                    Use the "Connect Wallet" button in the header to get started
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Info Footer */}
+            <div className="mt-8 p-4 rounded-xl bg-base-200 text-sm opacity-70">
+              <strong>💡 What is ZK-Intent Fusion?</strong>
+              <p className="mt-2">
+                A cross-chain intent optimization protocol that uses zero-knowledge proofs to securely
+                coordinate solver auctions, execute cross-chain transactions via Avail Nexus, and verify
+                execution correctness on-chain.
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -36,6 +93,9 @@ const Home: NextPage = () => {
               <div className="badge badge-secondary">Vincent Auth</div>
               <div className="badge badge-accent">Noir ZK</div>
               <div className="badge">ASI Chat</div>
+            </div>
+            <div className="mt-2 text-sm opacity-70">
+              Connected: <code className="bg-base-300 px-2 py-1 rounded">{address}</code>
             </div>
           </div>
 
@@ -109,6 +169,7 @@ const Home: NextPage = () => {
                 <ul className="list-disc list-inside opacity-70 space-y-1">
                   <li>Natural language intent parsing</li>
                   <li>Multi-solver auction with ZK proofs</li>
+                  <li>Access control (qualified solvers only)</li>
                   <li>Vincent/Lit authorization flow</li>
                   <li>Avail Nexus execution simulation</li>
                   <li>On-chain proof verification</li>
@@ -132,26 +193,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-export default Home;
+export default ZKIntentPage;
