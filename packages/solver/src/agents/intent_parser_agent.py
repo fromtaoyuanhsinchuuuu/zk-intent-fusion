@@ -4,9 +4,9 @@ In production, this would integrate with ASI Chat or MeTTa reasoning
 """
 import time
 from typing import Dict, Any
-from ..core.models import Intent, IntentAction, Strategy, TokenSpec
-from ..zk.mock_prover import generate_intent_commitment
-from ..integrations.lit import encrypt
+from core.models import Intent, IntentAction, Strategy, TokenSpec
+from zk.mock_prover import generate_intent_commitment
+from integrations.lit import encrypt
 
 
 def parse_natural_language(nl_text: str, user_address: str) -> Dict[str, Any]:

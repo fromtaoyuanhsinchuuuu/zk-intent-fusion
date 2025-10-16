@@ -41,12 +41,12 @@ contract IntentVerifier {
 
     /**
      * @notice Verify a solver's route optimization proof (MVP: basic validation)
-     * @param proof The ZK proof bytes (currently unused in MVP)
      * @param intentCommitment Commitment to the user's intent
      * @param claimedAPY The APY claimed by the solver (in basis points * 10)
      * @param claimedGasUsd Estimated gas cost in USD (with 18 decimals)
      * @param solver Address of the solver
      * @return bool Whether the proof is accepted
+     * @dev Proof parameter omitted in MVP, will be added for production with actual ZK verification
      */
     function verifySolverProof(
         bytes calldata /*proof*/,
@@ -86,11 +86,11 @@ contract IntentVerifier {
 
     /**
      * @notice Verify and record the execution result proof
-     * @param proof The ZK execution proof bytes (currently unused in MVP)
      * @param intentCommitment Original intent commitment
      * @param finalBalanceCommitment Commitment to the final balance state
      * @param timestamp Execution timestamp
      * @return bool Whether the execution is accepted
+     * @dev Proof parameter omitted in MVP, will be added for production with actual ZK verification
      */
     function verifyAndRecordExecution(
         bytes calldata /*proof*/,

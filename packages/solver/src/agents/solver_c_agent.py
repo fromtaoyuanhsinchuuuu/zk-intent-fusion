@@ -4,9 +4,9 @@ This demonstrates the access control mechanism - Solver C should fail
 """
 import time
 from typing import Optional
-from ..core.models import Intent, Plan, Bid
-from ..zk.mock_prover import generate_solver_proof
-from ..integrations.lit import check_access
+from core.models import Intent, Plan, Bid
+from zk.mock_prover import generate_solver_proof
+from integrations.lit import check_access
 
 
 SOLVER_ADDRESS = "0xSolverC"

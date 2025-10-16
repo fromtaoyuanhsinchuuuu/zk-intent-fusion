@@ -5,7 +5,7 @@ In production, this would use Noir/Barretenberg or another ZK proof system
 import hashlib
 import time
 from typing import Optional, Tuple, Dict, Any
-from ..core.models import Intent, Plan
+from core.models import Intent, Plan
 
 
 def _hash_data(*args) -> str:

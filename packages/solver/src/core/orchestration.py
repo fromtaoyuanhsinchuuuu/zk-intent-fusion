@@ -4,13 +4,13 @@ Combines parsing, auction, authorization, and execution
 """
 import time
 from typing import Dict, Any
-from .models import Intent
-from .state import get_state
-from ..agents.intent_parser_agent import parse_natural_language, validate_intent
-from ..agents.solver_a_agent import generate_solution as solve_a
-from ..agents.solver_b_agent import generate_solution as solve_b
-from ..agents.solver_c_agent import generate_solution as solve_c
-from ..agents.auction_agent import run_auction, get_auction_stats
+from core.models import Intent
+from core.state import get_state
+from agents.intent_parser_agent import parse_natural_language, validate_intent
+from agents.solver_a_agent import generate_solution as solve_a
+from agents.solver_b_agent import generate_solution as solve_b
+from agents.solver_c_agent import generate_solution as solve_c
+from agents.auction_agent import run_auction, get_auction_stats
 
 
 def submit_intent_flow(nl_text: str, user_address: str) -> Dict[str, Any]:
@@ -139,8 +139,8 @@ def execute_intent(intent_commitment: str) -> Dict[str, Any]:
     Returns:
         Execution result with transactions and proof
     """
-    from ..integrations.avail_nexus import bridge_and_execute
-    from ..zk.mock_prover import generate_execution_proof
+    from integrations.avail_nexus import bridge_and_execute
+    from zk.mock_prover import generate_execution_proof
     
     state = get_state()
     

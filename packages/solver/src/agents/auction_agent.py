@@ -3,8 +3,8 @@ Auction agent - manages the solver bidding process
 """
 import time
 from typing import List, Dict, Any
-from ..core.models import AuctionResult, Bid, Intent
-from ..zk.mock_prover import verify_solver_proof
+from core.models import AuctionResult, Bid, Intent
+from zk.mock_prover import verify_solver_proof
 
 
 def run_auction(
