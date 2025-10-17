@@ -26,6 +26,7 @@ class TokenSpec:
     symbol: str
     chain: str
     amount: float
+    address: str = ""  # Token contract address (optional)
     
     def to_dict(self):
         return asdict(self)
@@ -81,10 +82,14 @@ class Bid:
     claimed_apy_bps10: int
     claimed_gas_usd: float
     valid: bool
+    plan: Optional['Plan'] = None  # Execution plan for this bid
     timestamp: Optional[int] = None
     
     def to_dict(self):
-        return asdict(self)
+        result = asdict(self)
+        if self.plan:
+            result['plan'] = self.plan.to_dict()
+        return result
 
 
 @dataclass

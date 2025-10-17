@@ -69,8 +69,18 @@ def parse_natural_language(nl_text: str, user_address: str) -> Dict[str, Any]:
     
     # Create token specs (MVP: fixed example with stablecoins)
     tokens = [
-        TokenSpec(symbol="USDC", chain="arbitrum", amount=250.0),
-        TokenSpec(symbol="USDT", chain="polygon", amount=250.0)
+        TokenSpec(
+            symbol="USDC", 
+            chain="arbitrum", 
+            amount=250.0,
+            address="0xaf88d065e77c8cC2239327C5EDb3A432268e5831"  # USDC on Arbitrum
+        ),
+        TokenSpec(
+            symbol="USDT", 
+            chain="polygon", 
+            amount=250.0,
+            address="0xc2132D05D31c914a87C6611C10748AEb04B58e8F"  # USDT on Polygon
+        )
     ]
     total_value_usd = sum(t.amount for t in tokens)
     

@@ -11,6 +11,8 @@ from agents.solver_a_agent import generate_solution as solve_a
 from agents.solver_b_agent import generate_solution as solve_b
 from agents.solver_c_agent import generate_solution as solve_c
 from agents.auction_agent import run_auction, get_auction_stats
+from integrations.avail_nexus import bridge_and_execute
+from zk.mock_prover import generate_execution_proof
 
 
 def submit_intent_flow(nl_text: str, user_address: str) -> Dict[str, Any]:
@@ -78,6 +80,7 @@ def submit_intent_flow(nl_text: str, user_address: str) -> Dict[str, Any]:
     # Return comprehensive response
     return {
         "intent_commitment": intent.commitment,
+        "parsed_intent": intent.to_dict(),  # Add structured Intent JSON
         "public_metadata": parsed["public_metadata"],
         "auction": {
             "intent_commitment": auction_result.intent_commitment,
@@ -139,9 +142,6 @@ def execute_intent(intent_commitment: str) -> Dict[str, Any]:
     Returns:
         Execution result with transactions and proof
     """
-    from integrations.avail_nexus import bridge_and_execute
-    from zk.mock_prover import generate_execution_proof
-    
     state = get_state()
     
     # Check authorization

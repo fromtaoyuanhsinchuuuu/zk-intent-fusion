@@ -6,8 +6,44 @@ import { CONFIG } from "../app/api/config";
 
 const API_BASE = CONFIG.solverApiBase;
 
+export interface ExecutionPlan {
+  solver: string;
+  protocol: string;
+  route: string;
+  apy_bps10: number;
+  gas_usd: number;
+  estimated_duration: number;
+  steps: string[];
+}
+
+export interface SolverBid {
+  solver: string;
+  proof: string;
+  claimed_apy_bps10: number;
+  claimed_gas_usd: number;
+  valid: boolean;
+  plan?: ExecutionPlan;
+  timestamp?: number;
+}
+
 export interface IntentResponse {
   intent_commitment: string;
+  parsed_intent?: {
+    commitment: string;
+    user: string;
+    action: string;
+    strategy: string;
+    tokens: Array<{
+      symbol: string;
+      chain: string;
+      address: string;
+      amount?: string;
+    }>;
+    duration_days: number;
+    min_apy_bps: number;
+    max_gas_usd: number;
+    timestamp: number;
+  };
   public_metadata: {
     action: string;
     strategy: string;
@@ -18,22 +54,8 @@ export interface IntentResponse {
   };
   auction: {
     intent_commitment: string;
-    bids: Array<{
-      solver: string;
-      proof: string;
-      claimed_apy_bps10: number;
-      claimed_gas_usd: number;
-      valid: boolean;
-      timestamp?: number;
-    }>;
-    winner: {
-      solver: string;
-      proof: string;
-      claimed_apy_bps10: number;
-      claimed_gas_usd: number;
-      valid: boolean;
-      timestamp?: number;
-    };
+    bids: SolverBid[];
+    winner: SolverBid;
     stats: any;
   };
   status: string;
@@ -63,6 +85,71 @@ export interface ExecutionResponse {
   finalBalanceCommitment: string;
   proofTx: string;
   status: string;
+}
+
+export interface ParsedIntentResponse {
+  intent: {
+    user: string;
+    action: string;
+    tokens: Array<{
+      symbol: string;
+      chain: string;
+      amount: number;
+      address: string;
+    }>;
+    total_value_usd: number;
+    duration_days: number;
+    strategy: string;
+    max_gas_usd: number;
+    timestamp: number;
+    commitment: string;
+  };
+  public_metadata: {
+    action: string;
+    strategy: string;
+    duration: string;
+    estimated_total: string;
+    max_gas: string;
+    timestamp: number;
+  };
+  status: string;
+}
+
+export interface AuctionResponse {
+  intent_commitment: string;
+  auction: {
+    intent_commitment: string;
+    bids: SolverBid[];
+    winner: SolverBid;
+    stats: any;
+  };
+  status: string;
+}
+
+export async function parseIntent(nl: string, user: string = "0xAlice"): Promise<ParsedIntentResponse> {
+  const response = await fetch(
+    `${API_BASE}/parse-intent?nl=${encodeURIComponent(nl)}&user=${encodeURIComponent(user)}`
+  );
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Unknown error" }));
+    throw new Error(error.detail || "Failed to parse intent");
+  }
+  
+  return response.json();
+}
+
+export async function runAuction(commitment: string): Promise<AuctionResponse> {
+  const response = await fetch(
+    `${API_BASE}/run-auction?commitment=${encodeURIComponent(commitment)}`
+  );
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Unknown error" }));
+    throw new Error(error.detail || "Failed to run auction");
+  }
+  
+  return response.json();
 }
 
 export async function submitIntent(nl: string, user: string = "0xAlice"): Promise<IntentResponse> {

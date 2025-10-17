@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { submitIntent, type IntentResponse } from "../lib/apiClient";
+import { parseIntent, type ParsedIntentResponse } from "../lib/apiClient";
 
 interface IntentFormProps {
-  onParsed: (data: IntentResponse) => void;
+  onParsed: (data: ParsedIntentResponse) => void;
 }
 
 export default function IntentForm({ onParsed }: IntentFormProps) {
@@ -19,7 +19,7 @@ export default function IntentForm({ onParsed }: IntentFormProps) {
     setError("");
     
     try {
-      const result = await submitIntent(text);
+      const result = await parseIntent(text);
       onParsed(result);
     } catch (err: any) {
       setError(err.message || "Failed to parse intent");
@@ -67,7 +67,7 @@ export default function IntentForm({ onParsed }: IntentFormProps) {
             Parsing Intent...
           </>
         ) : (
-          "Parse Intent & Run Auction"
+          "Parse Intent"
         )}
       </button>
 

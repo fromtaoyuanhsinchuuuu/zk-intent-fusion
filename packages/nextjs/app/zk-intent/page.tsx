@@ -4,19 +4,22 @@ import { useState } from "react";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import IntentForm from "~~/components/IntentForm";
+import ParsedIntentPanel from "~~/components/ParsedIntentPanel";
 import AuctionPanel from "~~/components/AuctionPanel";
 import ExecutionPanel from "~~/components/ExecutionPanel";
 import ProofCard from "~~/components/ProofCard";
-import type { IntentResponse, ExecutionResponse } from "~~/lib/apiClient";
+import type { ParsedIntentResponse, AuctionResponse, ExecutionResponse } from "~~/lib/apiClient";
 
 const ZKIntentPage: NextPage = () => {
   const { address, isConnected } = useAccount();
-  const [intent, setIntent] = useState<IntentResponse | null>(null);
+  const [parsedIntent, setParsedIntent] = useState<ParsedIntentResponse | null>(null);
+  const [auction, setAuction] = useState<AuctionResponse | null>(null);
   const [authorized, setAuthorized] = useState(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResponse | null>(null);
 
   const handleReset = () => {
-    setIntent(null);
+    setParsedIntent(null);
+    setAuction(null);
     setAuthorized(false);
     setExecutionResult(null);
   };
@@ -102,8 +105,8 @@ const ZKIntentPage: NextPage = () => {
           {/* Progress Indicator */}
           <div className="mb-8">
             <ul className="steps steps-horizontal w-full">
-              <li className={`step ${intent ? "step-primary" : ""}`}>Parse Intent</li>
-              <li className={`step ${intent ? "step-primary" : ""}`}>Auction</li>
+              <li className={`step ${parsedIntent ? "step-primary" : ""}`}>Parse Intent</li>
+              <li className={`step ${auction ? "step-primary" : ""}`}>Auction</li>
               <li className={`step ${authorized ? "step-primary" : ""}`}>Authorize</li>
               <li className={`step ${executionResult ? "step-primary" : ""}`}>Execute</li>
               <li className={`step ${executionResult ? "step-primary" : ""}`}>Verify</li>
@@ -114,15 +117,26 @@ const ZKIntentPage: NextPage = () => {
           <div className="space-y-6">
             {/* Step 1: Intent Form */}
             <IntentForm onParsed={(res) => {
-              setIntent(res);
+              setParsedIntent(res);
+              setAuction(null);
               setAuthorized(false);
               setExecutionResult(null);
             }} />
 
+            {/* Step 1.5: Parsed Intent JSON Display with Run Auction Button */}
+            {parsedIntent && !auction && (
+              <ParsedIntentPanel 
+                parsedIntent={parsedIntent.intent}
+                onAuctionComplete={(auctionResult) => {
+                  setAuction(auctionResult);
+                }}
+              />
+            )}
+
             {/* Step 2: Auction Results */}
-            {intent && !authorized && (
+            {auction && !authorized && (
               <AuctionPanel
-                auction={intent.auction}
+                auction={auction.auction}
                 onAuthorized={() => setAuthorized(true)}
               />
             )}
@@ -130,7 +144,7 @@ const ZKIntentPage: NextPage = () => {
             {/* Step 3: Execution */}
             {authorized && !executionResult && (
               <ExecutionPanel
-                commitment={intent!.intent_commitment}
+                commitment={auction!.intent_commitment}
                 onExecuted={(result) => setExecutionResult(result)}
               />
             )}
@@ -148,7 +162,7 @@ const ZKIntentPage: NextPage = () => {
             )}
 
             {/* Reset Button */}
-            {intent && (
+            {parsedIntent && (
               <div className="text-center pt-4">
                 <button
                   className="btn btn-outline btn-sm"

@@ -101,6 +101,44 @@ export default function AuctionPanel({ auction, onAuthorized }: AuctionPanelProp
                     </div>
                   </div>
 
+                  {/* Execution Trace - Modern Arrow Flow */}
+                  {bid.plan && (
+                    <div className="mt-3 p-3 rounded-lg bg-base-300/50 space-y-2">
+                      <div className="text-xs font-semibold opacity-70 flex items-center gap-1">
+                        <span>🛣️ Execution Trace</span>
+                        <span className="badge badge-xs">{bid.plan.protocol}</span>
+                      </div>
+                      <div className="text-xs opacity-80 mb-2">
+                        <strong>Route:</strong> {bid.plan.route}
+                      </div>
+                      
+                      {/* Arrow-based Flow */}
+                      <div className="space-y-0">
+                        {bid.plan.steps.map((step: string, idx: number) => (
+                          <div key={idx}>
+                            <div className="flex items-start gap-2.5">
+                              <div className="flex flex-col items-center min-w-[20px]">
+                                <div className="badge badge-xs badge-outline w-5 h-5 flex items-center justify-center font-bold">
+                                  {idx + 1}
+                                </div>
+                                {idx < bid.plan.steps.length - 1 && (
+                                  <div className="text-primary text-base leading-tight my-0.5">↓</div>
+                                )}
+                              </div>
+                              <div className="flex-1 text-xs opacity-80 pt-0.5">{step}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="text-xs opacity-60 pt-2 border-t border-base-content/10 flex items-center gap-3">
+                        <span>⏱️ {bid.plan.estimated_duration}s</span>
+                        <span>•</span>
+                        <span>📊 {bid.plan.protocol}</span>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="text-xs opacity-50">
                     Proof: <code className="bg-base-300 px-1 rounded">{bid.proof.slice(0, 16)}...</code>
                   </div>
@@ -120,7 +158,7 @@ export default function AuctionPanel({ auction, onAuthorized }: AuctionPanelProp
       </div>
 
       {/* Winner Highlight */}
-      <div className="p-4 rounded-xl bg-success/20 border-2 border-success">
+      <div className="p-4 rounded-xl bg-success/20 border-2 border-success space-y-3">
         <div className="text-sm font-semibold opacity-70 mb-2">🎉 Selected Winner</div>
         <div className="flex items-center justify-between">
           <div>
@@ -135,6 +173,60 @@ export default function AuctionPanel({ auction, onAuthorized }: AuctionPanelProp
             </div>
           </div>
         </div>
+
+        {/* Winner's Execution Plan - Modern Arrow Flow */}
+        {winner.plan && (
+          <div className="mt-3 p-4 rounded-lg bg-base-100/80 space-y-3">
+            <div className="text-sm font-semibold flex items-center gap-2">
+              <span>📋 Winning Execution Plan</span>
+              <span className="badge badge-success badge-sm">{winner.plan.protocol.toUpperCase()}</span>
+            </div>
+            <div className="text-sm">
+              <strong className="opacity-70">Route:</strong> {winner.plan.route}
+            </div>
+            
+            {/* Arrow-based Flow with Enhanced Visual */}
+            <div className="space-y-2 mt-3">
+              <div className="text-xs font-semibold opacity-60 mb-2">Execution Steps:</div>
+              {winner.plan.steps.map((step: string, idx: number) => (
+                <div key={idx}>
+                  <div className="flex items-start gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="badge badge-success badge-sm min-w-[24px] h-[24px] flex items-center justify-center">
+                        {idx + 1}
+                      </div>
+                      {idx < winner.plan.steps.length - 1 && (
+                        <div className="flex flex-col items-center my-1">
+                          <div className="text-success text-lg leading-none">↓</div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 pt-0.5">
+                      <div className="text-sm font-medium">{step}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="text-xs opacity-60 pt-3 border-t border-base-content/10 flex items-center gap-4">
+              <span className="flex items-center gap-1">
+                <span>⏱️</span>
+                <strong>{winner.plan.estimated_duration}s</strong>
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <span>📊</span>
+                <strong>{winner.plan.protocol}</strong>
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <span>💰</span>
+                <strong>${winner.claimed_gas_usd.toFixed(2)} gas</strong>
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {error && (

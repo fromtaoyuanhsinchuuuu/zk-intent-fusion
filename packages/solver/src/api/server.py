@@ -46,6 +46,114 @@ def root():
     }
 
 
+@app.get("/parse-intent")
+def parse_intent_only(
+    nl: str = Query(..., description="Natural language intent"),
+    user: str = Query(default="0xAlice", description="User wallet address")
+):
+    """
+    Parse natural language intent to structured format
+    
+    Returns only the parsed intent without running auction
+    
+    Example:
+        GET /parse-intent?nl=Use all my stablecoins for 3 months, highest APY
+    """
+    try:
+        from agents.intent_parser_agent import parse_natural_language
+        from core.validation import validate_intent
+        
+        # Parse intent
+        parsed = parse_natural_language(nl, user)
+        intent = parsed["intent"]
+        
+        # Validate
+        is_valid, error = validate_intent(intent)
+        if not is_valid:
+            raise ValueError(f"Invalid intent: {error}")
+        
+        # Store intent in state
+        state = get_state()
+        state.set_intent(intent.commitment, intent)
+        
+        # Return parsed intent
+        return {
+            "intent": intent.to_dict(),
+            "public_metadata": parsed["public_metadata"],
+            "status": "parsed"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+
+
+@app.get("/run-auction")
+def run_auction_endpoint(
+    commitment: str = Query(..., description="Intent commitment hash")
+):
+    """
+    Run solver auction for a previously parsed intent
+    
+    Example:
+        GET /run-auction?commitment=0xabc123...
+    """
+    try:
+        from agents.solver_a_agent import generate_solution as solve_a
+        from agents.solver_b_agent import generate_solution as solve_b
+        from agents.solver_c_agent import generate_solution as solve_c
+        from agents.auction_agent import run_auction, get_auction_stats
+        
+        state = get_state()
+        intent = state.get_intent(commitment)
+        
+        if not intent:
+            raise ValueError("Intent not found. Please parse intent first.")
+        
+        # Get bids from solvers
+        bids = []
+        bid_c = solve_c(intent)
+        if bid_c:
+            bids.append(bid_c)
+        bid_a = solve_a(intent)
+        if bid_a:
+            bids.append(bid_a)
+        bid_b = solve_b(intent)
+        if bid_b:
+            bids.append(bid_b)
+        
+        if not bids:
+            raise ValueError("No solvers could provide a valid solution")
+        
+        # Run auction
+        auction_result = run_auction(
+            intent_commitment=intent.commitment,
+            bids=bids,
+            strategy=intent.strategy.value
+        )
+        
+        # Store auction result
+        state.set_auction(intent.commitment, auction_result)
+        
+        # Get statistics
+        stats = get_auction_stats(auction_result)
+        
+        return {
+            "intent_commitment": intent.commitment,
+            "auction": {
+                "intent_commitment": auction_result.intent_commitment,
+                "bids": [b.to_dict() for b in auction_result.bids],
+                "winner": auction_result.winner.to_dict(),
+                "stats": stats
+            },
+            "status": "auction_complete"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+
+
 @app.get("/submit-intent")
 def submit_intent(
     nl: str = Query(..., description="Natural language intent"),

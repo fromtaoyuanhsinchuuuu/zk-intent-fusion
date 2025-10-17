@@ -73,13 +73,14 @@ def generate_solution(intent: Intent) -> Optional[Bid]:
     if proof is None:
         return None  # Constraints not satisfied
     
-    # Create bid
+    # Create bid with execution plan
     bid = Bid(
         solver=SOLVER_ADDRESS,
         proof=proof,
         claimed_apy_bps10=plan.apy_bps10,
         claimed_gas_usd=plan.gas_usd,
         valid=True,
+        plan=plan,  # Include the execution plan
         timestamp=int(time.time())
     )
     

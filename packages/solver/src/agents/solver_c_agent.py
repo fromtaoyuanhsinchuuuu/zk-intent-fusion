@@ -45,13 +45,14 @@ def generate_solution(intent: Intent) -> Optional[Bid]:
         # This will create an invalid proof
         fake_proof = f"0xinvalid_proof_{SOLVER_ADDRESS[-6:]}"
         
-        # Create bid marked as invalid
+        # Create bid marked as invalid with guessed plan
         bid = Bid(
             solver=SOLVER_ADDRESS,
             proof=fake_proof,
             claimed_apy_bps10=plan.apy_bps10,
             claimed_gas_usd=plan.gas_usd,
             valid=False,  # Mark as invalid from the start
+            plan=plan,  # Include the guessed plan
             timestamp=int(time.time())
         )
         
