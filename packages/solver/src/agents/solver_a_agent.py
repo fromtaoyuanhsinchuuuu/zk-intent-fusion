@@ -27,25 +27,39 @@ def generate_solution(intent: Intent) -> Optional[Bid]:
     if not check_access(SOLVER_ADDRESS):
         return None
     
-    # Validate intent matches our capabilities
-    if intent.action.value != "yield_farm":
-        return None  # We only do yield farming
-    
-    # Generate execution plan
-    plan = Plan(
-        solver=SOLVER_ADDRESS,
-        protocol="morpho",
-        route="arbitrum+polygon → optimism → morpho",
-        apy_bps10=132,  # 13.2% APY
-        gas_usd=15.0,
-        estimated_duration=300,  # 5 minutes
-        steps=[
-            "Bridge USDC from Arbitrum to Optimism",
-            "Bridge USDT from Polygon to Optimism",
-            "Swap USDT to USDC on Optimism",
-            "Supply USDC to Morpho"
-        ]
-    )
+    # Generate execution plan based on intent action
+    if intent.action.value == "yield_farm":
+        plan = Plan(
+            solver=SOLVER_ADDRESS,
+            protocol="morpho",
+            route="arbitrum+polygon → optimism → morpho",
+            apy_bps10=132,  # 13.2% APY
+            gas_usd=15.0,
+            estimated_duration=300,  # 5 minutes
+            steps=[
+                "Bridge USDC from Arbitrum to Optimism",
+                "Bridge USDT from Polygon to Optimism",
+                "Swap USDT to USDC on Optimism",
+                "Supply USDC to Morpho"
+            ]
+        )
+    elif intent.action.value == "swap":
+        # Handle swap intents using 1inch aggregator
+        plan = Plan(
+            solver=SOLVER_ADDRESS,
+            protocol="1inch",
+            route="mainnet → 1inch aggregator → mainnet",
+            apy_bps10=0,  # No APY for swaps
+            gas_usd=8.5,
+            estimated_duration=30,  # 30 seconds
+            steps=[
+                "Get best rates from 1inch aggregator",
+                "Execute swap via 1inch router",
+                "Verify output amount meets minimum"
+            ]
+        )
+    else:
+        return None  # Unsupported action type
     
     # Check if plan meets intent constraints
     if plan.gas_usd > intent.max_gas_usd:

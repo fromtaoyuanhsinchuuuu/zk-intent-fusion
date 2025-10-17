@@ -5,8 +5,8 @@ import "~~/styles/globals.css";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
 export const metadata = getMetadata({
-  title: "Scaffold-ETH 2 App",
-  description: "Built with 🏗 Scaffold-ETH 2",
+  title: "ZK-Intent Fusion | Cross-chain Intent Protocol",
+  description: "Cross-chain intent optimization with ZK proofs. Powered by Avail Nexus, Vincent/Lit Protocol, Noir, and ASI Chat.",
 });
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
