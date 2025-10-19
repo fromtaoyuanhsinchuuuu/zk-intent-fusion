@@ -1,6 +1,7 @@
 # 🧩 ZK-Intent Fusion
 
 <h4 align="center">
+  <a href="./DEMO_README.md">🎭 Multi-Role Demo</a> |
   <a href="./STARTUP_GUIDE.md">Startup Guide</a> |
   <a href="http://localhost:8787/docs">API Docs</a> |
   <a href="./CONTRIBUTING.md">Contributing</a>

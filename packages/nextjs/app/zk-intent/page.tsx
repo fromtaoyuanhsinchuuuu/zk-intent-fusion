@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import IntentForm from "~~/components/IntentForm";
@@ -9,6 +9,7 @@ import AuctionPanel from "~~/components/AuctionPanel";
 import ExecutionPanel from "~~/components/ExecutionPanel";
 import ProofCard from "~~/components/ProofCard";
 import type { ParsedIntentResponse, AuctionResponse, ExecutionResponse } from "~~/lib/apiClient";
+import { useIntentStore } from "~~/lib/intentStore";
 
 const ZKIntentPage: NextPage = () => {
   const { address, isConnected } = useAccount();
@@ -17,11 +18,47 @@ const ZKIntentPage: NextPage = () => {
   const [authorized, setAuthorized] = useState(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResponse | null>(null);
 
+  // Use Zustand store
+  const { setIntent, setAuctionResults, setAuthorization, winner, authorizationStatus } = useIntentStore();
+
+  // Sync parsed intent to store
+  useEffect(() => {
+    if (parsedIntent?.intent) {
+      setIntent({
+        intentId: parsedIntent.intent_commitment,
+        commitment: parsedIntent.intent_commitment,
+        encryptedPayload: parsedIntent.encrypted_payload || "0x" + "a".repeat(128),
+        originalText: parsedIntent.original_text || "",
+        parsedIntent: parsedIntent.intent,
+      });
+    }
+  }, [parsedIntent, setIntent]);
+
+  // Sync auction results to store
+  useEffect(() => {
+    if (auction?.auction) {
+      const bids = auction.auction.bids.map(bid => ({
+        ...bid,
+        solver_address: bid.solver_id === "solver_a" ? "0xBob1234567890123456789012345678901234" : "0xCharlie567890123456789012345678905678",
+      }));
+      const winningBid = bids.find(b => b.solver_id === auction.auction.winner_id);
+      if (winningBid) {
+        setAuctionResults(bids, winningBid);
+      }
+    }
+  }, [auction, setAuctionResults]);
+
   const handleReset = () => {
     setParsedIntent(null);
     setAuction(null);
     setAuthorized(false);
     setExecutionResult(null);
+    useIntentStore.getState().reset();
+  };
+
+  const handleAuthorize = () => {
+    setAuthorized(true);
+    setAuthorization("0xauthorization_tx_hash_" + Date.now());
   };
 
   // Show wallet connection prompt if not connected
@@ -100,6 +137,39 @@ const ZKIntentPage: NextPage = () => {
             <div className="mt-2 text-sm opacity-70">
               Connected: <code className="bg-base-300 px-2 py-1 rounded">{address}</code>
             </div>
+
+            {/* Multi-Role Demo Links */}
+            {parsedIntent && (
+              <div className="mt-6 p-4 bg-info/10 border border-info rounded-xl">
+                <p className="font-semibold mb-3 flex items-center justify-center gap-2">
+                  <span className="text-2xl">🎭</span>
+                  <span>Multi-Role Demo: Open These Pages in Separate Tabs</span>
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <a href="/zk-intent/parsing" target="_blank" rel="noreferrer" className="btn btn-sm btn-info">
+                    🤖 Parsing Agent
+                  </a>
+                  <a href="/zk-intent/solvers/bob" target="_blank" rel="noreferrer" className="btn btn-sm btn-success">
+                    🏆 Solver Bob (Qualified)
+                  </a>
+                  <a href="/zk-intent/solvers/charlie" target="_blank" rel="noreferrer" className="btn btn-sm btn-success">
+                    🏆 Solver Charlie (Qualified)
+                  </a>
+                  <a href="/zk-intent/solvers/eve" target="_blank" rel="noreferrer" className="btn btn-sm btn-warning">
+                    ⛔ Solver Eve (Privacy Demo)
+                  </a>
+                  <a href="/zk-intent/auction" target="_blank" rel="noreferrer" className="btn btn-sm btn-secondary">
+                    🎯 Auction Dashboard
+                  </a>
+                  <a href="/zk-intent/execution" target="_blank" rel="noreferrer" className="btn btn-sm btn-primary">
+                    🚀 Execution Monitor
+                  </a>
+                </div>
+                <p className="text-xs opacity-70 mt-2">
+                  💡 Tip: Open each page in a new tab to see different perspectives simultaneously
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Progress Indicator */}
@@ -137,7 +207,7 @@ const ZKIntentPage: NextPage = () => {
             {auction && !authorized && (
               <AuctionPanel
                 auction={auction.auction}
-                onAuthorized={() => setAuthorized(true)}
+                onAuthorized={handleAuthorize}
               />
             )}
 

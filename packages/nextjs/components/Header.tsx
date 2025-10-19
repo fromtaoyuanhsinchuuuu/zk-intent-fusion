@@ -25,6 +25,10 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/zk-intent",
   },
   {
+    label: "Nexus SDK Direct",
+    href: "/nexus-sdk-direct",
+  },
+  {
     label: "Debug Contracts",
     href: "/debug",
     icon: <BugAntIcon className="h-4 w-4" />,
