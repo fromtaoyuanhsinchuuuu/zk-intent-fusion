@@ -1,25 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { parseIntent, type ParsedIntentResponse } from "../lib/apiClient";
+import { parseIntentWithAgent, type ParsedIntentResponse } from "../lib/apiClient";
 
 interface IntentFormProps {
   onParsed: (data: ParsedIntentResponse) => void;
+  userAddress?: string;
 }
 
-export default function IntentForm({ onParsed }: IntentFormProps) {
+export default function IntentForm({ onParsed, userAddress }: IntentFormProps) {
   const [text, setText] = useState(
-    "Use all my stablecoins for 3 months, highest APY, tolerate 3% gas"
+    "Supply 500 USDC on Morpho with highest APY on Optimism"
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [source, setSource] = useState<"uAgent" | "fallback" | null>(null);
 
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
+    setSource(null);
     
     try {
-      const result = await parseIntent(text);
+      const result = await parseIntentWithAgent(text, userAddress || "0xAlice");
+      
+      // Show which parser was used
+      if (result.source === "uAgent") {
+        setSource("uAgent");
+        console.log("✅ Parsed by Fetch.ai uAgent");
+      } else {
+        setSource("fallback");
+        console.log("ℹ️ Parsed by fallback system");
+      }
+      
       onParsed(result);
     } catch (err: any) {
       setError(err.message || "Failed to parse intent");
@@ -50,6 +63,20 @@ export default function IntentForm({ onParsed }: IntentFormProps) {
         />
       </div>
 
+      {source && (
+        <div className={`p-3 rounded-lg text-sm ${
+          source === "uAgent" 
+            ? "bg-success/10 border border-success text-success" 
+            : "bg-info/10 border border-info text-info"
+        }`}>
+          {source === "uAgent" ? (
+            <span>✅ Parsed by Fetch.ai uAgent</span>
+          ) : (
+            <span>ℹ️ Parsed by fallback system (uAgent unavailable)</span>
+          )}
+        </div>
+      )}
+
       {error && (
         <div className="p-4 rounded-xl bg-error/10 border border-error text-error">
           <span className="font-semibold">Error:</span> {error}
@@ -74,9 +101,9 @@ export default function IntentForm({ onParsed }: IntentFormProps) {
       <div className="text-xs opacity-60 space-y-1">
         <p>💡 Try these examples:</p>
         <ul className="list-disc list-inside space-y-1">
-          <li>"Use all my stablecoins for 3 months, highest APY"</li>
+          <li>"Supply 500 USDC on Morpho with highest APY on Optimism"</li>
           <li>"Swap 1000 USDC to ETH with lowest gas fees"</li>
-          <li>"Provide liquidity on Uniswap, balanced risk"</li>
+          <li>"Bridge 200 USDT from Arbitrum to Base"</li>
         </ul>
       </div>
     </div>

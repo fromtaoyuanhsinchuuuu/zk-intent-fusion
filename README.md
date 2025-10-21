@@ -10,7 +10,7 @@
 🚀 **ZK-Intent Fusion** is a decentralized intent-centric protocol that combines natural language processing, zero-knowledge proofs, solver auctions, and cross-chain execution to optimize user outcomes in DeFi.
 
 Built for the **AlphaMax Hackathon**, this project demonstrates:
-- 🤖 **ASI Chat Integration**: Natural language intent parsing
+- 🤖 **Fetch.ai uAgents**: Autonomous intent parsing with fallback mechanism
 - 🔐 **Vincent/Lit Protocol**: Privacy-preserving access control
 - 🔗 **Avail Nexus**: Cross-chain intent execution
 - 🧮 **ZK Proofs (Noir)**: Privacy-preserving verification
@@ -62,7 +62,7 @@ For detailed step-by-step instructions, see **[STARTUP_GUIDE.md](./STARTUP_GUIDE
                             ▼
 ┌──────────────────────────────────────────────────────────────────┐
 │                     SOLVER BACKEND (FastAPI)                     │
-│  - Intent Parser (ASI Chat simulation)                           │
+│  - uAgent Intent Parser (Fetch.ai) + Fallback                    │
 │  - Solver Agents (A: Morpho, B: Aave, C: Unqualified)          │
 │  - Auction Engine (selects optimal solver)                       │
 │  - Cross-chain Execution Simulator (Nexus)                       │
@@ -150,6 +150,7 @@ zk-intent-fusion/
 │       │   ├── api/
 │       │   │   └── server.py       # Main API routes
 │       │   ├── agents/
+│       │   │   ├── uagent_parser.py   # Fetch.ai uAgent parser
 │       │   │   ├── solver_a_agent.py  # Morpho solver
 │       │   │   ├── solver_b_agent.py  # Aave solver
 │       │   │   └── solver_c_agent.py  # Unqualified solver
@@ -161,6 +162,7 @@ zk-intent-fusion/
 │       │   └── zk/
 │       │       ├── circuits/       # Noir ZK circuits
 │       │       └── mock_prover.py  # Mock proof generation
+│       ├── start_uagent.sh         # Start uAgent server
 │       └── .env.example
 │
 ├── start-demo.sh                   # Automated startup
@@ -170,6 +172,13 @@ zk-intent-fusion/
 ```
 
 ## 🔑 Key Features Implemented
+
+### ✅ Intent Parsing with uAgents
+- **Fetch.ai uAgent Integration**: Autonomous agent for intelligent intent parsing
+- **REST API Endpoint**: uAgent exposes POST /parse on port 8001
+- **Fallback Mechanism**: Automatic fallback to OpenAI or rule-based parsing if uAgent is unavailable
+- **5-Second Timeout**: Quick failover ensures demo reliability
+- **Source Tracking**: UI displays whether intent was parsed by uAgent or fallback system
 
 ### ✅ Security & Access Control
 - **Anti-Replay Protection**: `intentProcessed` mapping prevents double-spending
@@ -217,12 +226,28 @@ python -m pytest tests/
 ```
 
 ### Manual API Testing
+
 ```bash
-# Start backend first
+# Start uAgent parser (optional - will auto-fallback if not running)
+cd packages/solver
+./start_uagent.sh
+
+# In another terminal, start backend
 cd packages/solver
 python -m uvicorn src.api.server:app --port 8787
 
-# Test endpoints
+# Test uAgent endpoint directly
+curl -X POST http://localhost:8001/parse \
+  -H "Content-Type: application/json" \
+  -d '{"user_address":"0xAlice","natural_text":"Supply 500 USDC on Morpho"}'
+
+# Test Next.js API with uAgent fallback
+# (Start Next.js first: cd packages/nextjs && yarn dev)
+curl -X POST http://localhost:3000/api/parse-intent \
+  -H "Content-Type: application/json" \
+  -d '{"userAddress":"0xAlice","naturalText":"Supply 500 USDC on Morpho"}'
+
+# Test other endpoints
 curl http://localhost:8787/
 curl -X POST http://localhost:8787/parse-intent \
   -H "Content-Type: application/json" \
@@ -236,7 +261,7 @@ curl -X POST http://localhost:8787/parse-intent \
 - ⚠️ ZK proofs are mocked (no real Noir proving)
 - ⚠️ Access control uses hardcoded list (not querying on-chain registry)
 - ⚠️ Cross-chain execution is simulated (not using Avail Nexus SDK)
-- ⚠️ ASI Chat is mocked (simple pattern matching)
+- ✅ **uAgent integration complete** with automatic fallback to rule-based parsing
 
 ### Smart Contracts
 - ⚠️ No actual ZK verification (only records commitment)
@@ -255,7 +280,7 @@ curl -X POST http://localhost:8787/parse-intent \
 - [ ] Query on-chain registry from Python backend
 - [ ] Integrate actual Lit Protocol SDK
 - [ ] Use real Avail Nexus SDK for bridging
-- [ ] Integrate ASI Chat API
+- [x] **Fetch.ai uAgents integration** with fallback mechanism
 
 ### Phase 2: Infrastructure
 - [ ] PostgreSQL database for state persistence
@@ -307,9 +332,10 @@ Built with:
 - [Next.js](https://nextjs.org) - React framework
 - [FastAPI](https://fastapi.tiangolo.com) - Python API framework
 - [Noir](https://noir-lang.org) - ZK circuit language
+- [Fetch.ai uAgents](https://fetch.ai/docs/guides/agents/getting-started) - Autonomous agent framework
 
 Sponsored by AlphaMax Hackathon:
-- **Fetch.ai** (ASI Chat)
+- **Fetch.ai** (uAgents for intent parsing)
 - **Lit Protocol** (Vincent)
 - **Avail** (Nexus)
 

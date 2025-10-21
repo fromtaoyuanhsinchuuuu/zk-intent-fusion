@@ -13,7 +13,7 @@ uvicorn = {extras = ["standard"], version = "^0.27.0"}
 pydantic = "^2.5.0"
 python-dotenv = "^1.0.0"
 httpx = "^0.26.0"
-# uagents = "^0.12.0"  # Uncomment when integrating Fetch.ai agents
+uagents = "^0.12.0"
 eth-hash = {extras = ["pycryptodome"], version = "^0.5.2"}
 web3 = "^6.15.0"
 

@@ -186,12 +186,15 @@ const ZKIntentPage: NextPage = () => {
           {/* Main Flow */}
           <div className="space-y-6">
             {/* Step 1: Intent Form */}
-            <IntentForm onParsed={(res) => {
-              setParsedIntent(res);
-              setAuction(null);
-              setAuthorized(false);
-              setExecutionResult(null);
-            }} />
+            <IntentForm 
+              userAddress={address}
+              onParsed={(res) => {
+                setParsedIntent(res);
+                setAuction(null);
+                setAuthorized(false);
+                setExecutionResult(null);
+              }} 
+            />
 
             {/* Step 1.5: Parsed Intent JSON Display with Run Auction Button */}
             {parsedIntent && !auction && (

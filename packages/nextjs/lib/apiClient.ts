@@ -126,6 +126,87 @@ export interface AuctionResponse {
   status: string;
 }
 
+/**
+ * Parse intent using uAgent with fallback (Next.js API route)
+ * This calls /api/parse-intent which tries uAgent first, then falls back
+ */
+export async function parseIntentWithAgent(
+  nl: string,
+  user: string = "0xAlice"
+): Promise<ParsedIntentResponse & { source?: "uAgent" | "fallback" }> {
+  const response = await fetch("/api/parse-intent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      naturalText: nl,
+      userAddress: user,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(error.error || "Failed to parse intent");
+  }
+
+  const result = await response.json();
+  
+  // Now register the parsed intent with the Python backend
+  // This is CRITICAL so the auction system can find it
+  console.log("📤 Registering intent with Python backend...");
+  const naturalLanguage = `${result.action} ${result.amount} ${result.token} on ${result.protocol}`;
+  
+  try {
+    const backendResponse = await fetch(
+      `${API_BASE}/parse-intent?nl=${encodeURIComponent(naturalLanguage)}&user=${encodeURIComponent(user)}`
+    );
+    
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json().catch(() => ({ detail: "Unknown error" }));
+      throw new Error(`Backend registration failed: ${errorData.detail || backendResponse.statusText}`);
+    }
+    
+    const backendResult = await backendResponse.json();
+    console.log("✅ Intent registered with backend, commitment:", backendResult.intent.commitment);
+    
+    // Return the backend result with the uAgent source info
+    return {
+      ...backendResult,
+      source: result.source, // 'uAgent' or 'fallback'
+    };
+  } catch (error) {
+    console.error("❌ Failed to register with backend:", error);
+    throw new Error(`Failed to register intent with backend: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
+  
+  // This code should never be reached since we throw error above
+  return {
+    intent: {
+      user: result.user_address || user,
+      action: result.action,
+      tokens: [], // Will be filled by Python backend if needed
+      total_value_usd: parseFloat(result.amount) || 0,
+      duration_days: 90,
+      strategy: "balanced",
+      max_gas_usd: 15,
+      timestamp: Date.now(),
+      commitment: `0x${Math.random().toString(16).slice(2)}`, // Temporary
+    },
+    public_metadata: {
+      action: result.action,
+      strategy: "balanced",
+      duration: "90 days",
+      estimated_total: `$${result.amount || "100"}`,
+      max_gas: "$15.00",
+      timestamp: Date.now(),
+    },
+    status: "parsed",
+    source: result.source, // 'uAgent' or 'fallback'
+  };
+}
+
+/**
+ * Original parseIntent function (calls Python solver backend)
+ */
 export async function parseIntent(nl: string, user: string = "0xAlice"): Promise<ParsedIntentResponse> {
   const response = await fetch(
     `${API_BASE}/parse-intent?nl=${encodeURIComponent(nl)}&user=${encodeURIComponent(user)}`
