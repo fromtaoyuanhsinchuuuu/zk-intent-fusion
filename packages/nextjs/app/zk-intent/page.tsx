@@ -37,11 +37,22 @@ const ZKIntentPage: NextPage = () => {
   // Sync auction results to store
   useEffect(() => {
     if (auction?.auction) {
-      const bids = auction.auction.bids.map(bid => ({
-        ...bid,
-        solver_address: bid.solver_id === "solver_a" ? "0xBob1234567890123456789012345678901234" : "0xCharlie567890123456789012345678905678",
+      const bids = auction.auction.bids.map((bid: any) => ({
+        solver_id: bid.solver || "unknown",
+        solver_name: bid.solver === "0xSolverA" ? "Solver Bob" : bid.solver === "0xSolverB" ? "Solver Charlie" : "Solver Eve",
+        solver_address: bid.solver || "0x000",
+        strategy: bid.plan?.protocol || "unknown",
+        expected_apy: (bid.claimed_apy_bps10 || 0) / 100,
+        estimated_gas: bid.claimed_gas_usd || 0,
+        gas_percentage: 0,
+        protocol: bid.plan?.protocol || "unknown",
+        target_chain: "optimism",
+        route: bid.plan?.route ? [bid.plan.route] : [],
+        zk_proof: bid.proof || "0x0",
+        qualified: bid.valid || false,  // Map 'valid' to 'qualified'
+        rejection_reason: !bid.valid ? (bid.solver === "0xSolverC" ? "Not in qualified solver registry" : "Failed ZK proof verification") : undefined,
       }));
-      const winningBid = bids.find(b => b.solver_id === auction.auction.winner_id);
+      const winningBid = bids.find((b: any) => b.qualified);
       if (winningBid) {
         setAuctionResults(bids, winningBid);
       }

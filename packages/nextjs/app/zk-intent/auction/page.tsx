@@ -123,16 +123,29 @@ export default function AuctionDashboardPage() {
         <div className="card-body">
           <h2 className="card-title mb-4">📊 Received Bids ({solverBids.length})</h2>
 
+          {/* Winner Banner */}
+          {isAuctionComplete && winner && (
+            <div className="alert alert-success mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <h3 className="font-bold text-lg">🏆 Winner Selected!</h3>
+                <div className="text-sm">{winner.solver_name} won with {winner.expected_apy}% APY and ${winner.estimated_gas} gas cost</div>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             {solverBids.map((bid, index) => (
               <div
                 key={bid.solver_id}
                 className={`card bg-base-200 border-2 ${
                   winner?.solver_id === bid.solver_id
-                    ? "border-success shadow-lg"
+                    ? "border-success shadow-lg bg-success/5"
                     : bid.qualified
                       ? "border-base-300"
-                      : "border-error"
+                      : "border-error bg-error/5"
                 }`}
               >
                 <div className="card-body">
@@ -140,11 +153,17 @@ export default function AuctionDashboardPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         {winner?.solver_id === bid.solver_id && (
-                          <span className="badge badge-success badge-lg">🏆 WINNER</span>
+                          <span className="badge badge-success badge-lg gap-2">
+                            <span className="text-xl">🏆</span>
+                            WINNER
+                          </span>
+                        )}
+                        {bid.qualified && winner?.solver_id !== bid.solver_id && (
+                          <span className="badge badge-info badge-lg">✅ QUALIFIED</span>
                         )}
                         {!bid.qualified && <span className="badge badge-error badge-lg">❌ REJECTED</span>}
                         <h3 className="text-xl font-bold">
-                          {index + 1}. Solver {bid.solver_name}
+                          {index + 1}. {bid.solver_name}
                         </h3>
                       </div>
 
@@ -153,7 +172,7 @@ export default function AuctionDashboardPage() {
                           <div className="grid grid-cols-3 gap-4 mt-3">
                             <div>
                               <p className="text-xs text-base-content/70">Gas Cost</p>
-                              <p className="text-lg font-bold text-warning">
+                              <p className={`text-lg font-bold ${winner?.solver_id === bid.solver_id ? "text-success" : "text-warning"}`}>
                                 ${bid.estimated_gas} ({bid.gas_percentage}%)
                               </p>
                             </div>
