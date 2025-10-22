@@ -52,7 +52,7 @@ export const Footer = () => {
             <span>·</span>
             <div className="flex justify-center items-center gap-2">
               <p className="m-0 text-center opacity-70">
-                Built with <HeartIcon className="inline-block h-4 w-4" /> for AlphaMax Hackathon
+                Built with <HeartIcon className="inline-block h-4 w-4" /> for ETHOnline 2025
               </p>
             </div>
             <span>·</span>

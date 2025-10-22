@@ -9,7 +9,7 @@
 
 🚀 **ZK-Intent Fusion** is a decentralized intent-centric protocol that combines natural language processing, zero-knowledge proofs, solver auctions, and cross-chain execution to optimize user outcomes in DeFi.
 
-Built for the **AlphaMax Hackathon**, this project demonstrates:
+Built for the **ETHOnline 2025** hackathon, this project demonstrates:
 - 🤖 **Fetch.ai uAgents**: Autonomous intent parsing with fallback mechanism
 - 🔐 **Vincent/Lit Protocol**: Privacy-preserving access control
 - 🔗 **Avail Nexus**: Cross-chain intent execution
@@ -334,7 +334,7 @@ Built with:
 - [Noir](https://noir-lang.org) - ZK circuit language
 - [Fetch.ai uAgents](https://fetch.ai/docs/guides/agents/getting-started) - Autonomous agent framework
 
-Sponsored by AlphaMax Hackathon:
+Sponsored by ETHOnline 2025:
 - **Fetch.ai** (uAgents for intent parsing)
 - **Lit Protocol** (Vincent)
 - **Avail** (Nexus)
@@ -343,7 +343,7 @@ Sponsored by AlphaMax Hackathon:
 
 <div align="center">
 
-**Built for AlphaMax Hackathon 2025** 🚀
+**Built for ETHOnline 2025** 🚀
 
 [Report Bug](https://github.com/your-repo/issues) · [Request Feature](https://github.com/your-repo/issues)
 
