@@ -23,14 +23,94 @@ export default function ExecutionMonitorPage() {
   } = useIntentStore();
 
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
+  const [autoCompleted, setAutoCompleted] = useState(false);
 
-  // Auto-start execution when authorized
+  // Auto-complete execution instantly when page loads with authorization
   useEffect(() => {
-    if (authorizationStatus === "completed" && executionStatus === "idle") {
+    if (authorizationStatus === "completed" && !autoCompleted) {
+      setAutoCompleted(true);
+      
+      // Start execution
+      if (executionStatus === "idle") {
+        startExecution();
+      }
+
+      // Auto-complete all steps instantly
+      const completeAllSteps = async () => {
+        // Complete step 1
+        updateExecutionStep(1, "in-progress");
+        await new Promise(resolve => setTimeout(resolve, 100));
+        updateExecutionStep(1, "completed", {
+          source_tx: "0xabc123...def456 (Arbitrum)",
+          dest_tx: "0x123456...789012 (Optimism)",
+          amount: "250 USDC",
+          fee: "$3.50",
+        });
+
+        // Complete step 2
+        await new Promise(resolve => setTimeout(resolve, 100));
+        updateExecutionStep(2, "in-progress");
+        await new Promise(resolve => setTimeout(resolve, 100));
+        updateExecutionStep(2, "completed", {
+          source_tx: "0xghi789...jkl012 (Polygon)",
+          dest_tx: "0x789012...345678 (Optimism)",
+          amount: "250 USDT",
+          fee: "$3.00",
+        });
+
+        // Complete step 3
+        await new Promise(resolve => setTimeout(resolve, 100));
+        updateExecutionStep(3, "in-progress");
+        await new Promise(resolve => setTimeout(resolve, 100));
+        updateExecutionStep(3, "completed", {
+          source_tx: "0xmno345...pqr678 (Optimism)",
+          amount: "250 USDT → 249.5 USDC",
+          fee: "$2.00",
+        });
+
+        // Complete step 4
+        await new Promise(resolve => setTimeout(resolve, 100));
+        updateExecutionStep(4, "in-progress");
+        await new Promise(resolve => setTimeout(resolve, 100));
+        updateExecutionStep(4, "completed", {
+          source_tx: "0xstu901...vwx234 (Optimism)",
+          amount: "499.5 USDC",
+          fee: "$6.50",
+        });
+
+        // Set final result
+        await new Promise(resolve => setTimeout(resolve, 200));
+        setFinalResult({
+          initial_assets: "500 USD (250 USDC + 250 USDT)",
+          total_gas_fees: "$15.00",
+          final_position: "499.5 USDC @ Morpho (Optimism)",
+          expected_monthly_yield: "~$5.47",
+          net_return: "~$1.41 profit (3 months)",
+        });
+
+        // Add execution proof
+        await new Promise(resolve => setTimeout(resolve, 300));
+        addZkProof({
+          type: "Execution Correctness Proof",
+          hash: "0xexec_07a0a2f92686d2082",
+          tx: "0xverifier_tx_mock_13ecdcaa",
+          verifier: "IntentVerifier",
+          status: "verified",
+          block: "12345690",
+        });
+      };
+
+      completeAllSteps();
+    }
+  }, [authorizationStatus, autoCompleted, executionStatus, startExecution, updateExecutionStep, setFinalResult, addZkProof]);
+
+  // Auto-start execution when authorized (legacy support)
+  useEffect(() => {
+    if (authorizationStatus === "completed" && executionStatus === "idle" && !autoCompleted) {
       startExecution();
       setCurrentStepIndex(0);
     }
-  }, [authorizationStatus, executionStatus, startExecution]);
+  }, [authorizationStatus, executionStatus, startExecution, autoCompleted]);
 
   // Simulate step-by-step execution
   useEffect(() => {
@@ -54,10 +134,10 @@ export default function ExecutionMonitorPage() {
             setTimeout(() => {
               setFinalResult({
                 initial_assets: "500 USD (250 USDC + 250 USDT)",
-                total_gas_fees: "$12.50",
+                total_gas_fees: "$15.00",
                 final_position: "499.5 USDC @ Morpho (Optimism)",
-                expected_monthly_yield: "~$5.20",
-                net_return: "~$3.10 profit (3 months)",
+                expected_monthly_yield: "~$5.47",
+                net_return: "~$1.41 profit (3 months)",
               });
 
               // Add execution proof

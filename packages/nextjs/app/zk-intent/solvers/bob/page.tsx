@@ -17,9 +17,9 @@ export default function SolverBobPage() {
     solver_name: "Bob",
     solver_address: "0xBob1234567890123456789012345678901234",
     strategy: "Supply to Morpho (Optimism)",
-    expected_apy: 12.5,
-    estimated_gas: 12.5,
-    gas_percentage: 2.5,
+    expected_apy: 13.2,
+    estimated_gas: 15.0,
+    gas_percentage: 3.0,
     protocol: "Morpho",
     target_chain: "Optimism",
     route: [

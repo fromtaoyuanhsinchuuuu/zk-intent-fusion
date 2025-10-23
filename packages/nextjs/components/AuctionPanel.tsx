@@ -79,9 +79,10 @@ export default function AuctionPanel({ auction, onAuthorized }: AuctionPanelProp
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">
-                      {bid.solver === "0xSolverA" && "🔷 Morpho Optimizer"}
-                      {bid.solver === "0xSolverB" && "🔶 Aave Efficiency"}
-                      {!["0xSolverA", "0xSolverB"].includes(bid.solver) && bid.solver}
+                      {bid.solver === "0xSolverA" && "�‍💼 Solver Bob (Morpho)"}
+                      {bid.solver === "0xSolverB" && "👨‍💼 Solver Charlie (Aave)"}
+                      {bid.solver === "0xSolverC" && "👨‍� Solver Eve (Unqualified)"}
+                      {!["0xSolverA", "0xSolverB", "0xSolverC"].includes(bid.solver) && bid.solver}
                     </span>
                     {bid.solver === winner.solver && (
                       <span className="badge badge-success badge-sm">WINNER</span>

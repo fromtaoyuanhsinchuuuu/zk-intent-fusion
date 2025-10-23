@@ -1,0 +1,51 @@
+✅ APY 和 Gas 費用統一完成
+================================
+
+## 問題
+主頁面的 solver APY 顯示與其他分頁不一致
+
+## 修正內容
+
+### 1. Bob (Solver A / Morpho) - bob/page.tsx
+修正前:
+- Expected APY: 12.5%
+- Estimated Gas: $12.50
+- Gas Percentage: 2.5%
+
+修正後:
+- Expected APY: 13.2%  ✅
+- Estimated Gas: $15.00 ✅
+- Gas Percentage: 3.0%  ✅
+
+### 2. Charlie (Solver B / Aave) - charlie/page.tsx
+修正前:
+- Expected APY: 11.8%
+- Estimated Gas: $15.00
+- Target Chain: Base
+
+修正後:
+- Expected APY: 12.1%     ✅
+- Estimated Gas: $11.00   ✅
+- Target Chain: Optimism  ✅
+- Route: 更新為與 backend 一致
+
+### 3. Execution Page - execution/page.tsx
+修正前:
+- Total Gas Fees: $12.50
+- Expected Monthly Yield: ~$5.20
+- Net Return: ~$3.10 profit
+
+修正後:
+- Total Gas Fees: $15.00          ✅
+- Expected Monthly Yield: ~$5.47  ✅
+- Net Return: ~$1.41 profit       ✅
+
+## Backend 參考數值 (packages/solver/src/agents/)
+- Solver A (Morpho): apy_bps10=132 (13.2%), gas=$15.00
+- Solver B (Aave):   apy_bps10=121 (12.1%), gas=$11.00
+
+## 結果
+✅ 所有頁面的 APY 和 Gas 費用現在與 backend 完全一致
+✅ Bob (Morpho) 13.2% APY, $15.00 gas - WINNER 🏆
+✅ Charlie (Aave) 12.1% APY, $11.00 gas - QUALIFIED
+✅ 計算公式: bps10 / 10 = APY% (例: 132 / 10 = 13.2%)

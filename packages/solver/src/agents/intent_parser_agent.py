@@ -39,14 +39,18 @@ def parse_natural_language(nl_text: str, user_address: str) -> Dict[str, Any]:
         action = IntentAction.YIELD_FARM  # Default
     
     # Detect strategy
-    if "highest apy" in nl_lower or "maximum return" in nl_lower:
+    if "highest" in nl_lower and ("apy" in nl_lower or "return" in nl_lower or "yield" in nl_lower):
         strategy = Strategy.HIGHEST_APY
-    elif "lowest gas" in nl_lower or "cheapest" in nl_lower:
+    elif "lowest gas" in nl_lower or "cheapest" in nl_lower or "minimum gas" in nl_lower:
         strategy = Strategy.LOWEST_GAS
     elif "safest" in nl_lower or "secure" in nl_lower:
         strategy = Strategy.SAFEST
     else:
-        strategy = Strategy.BALANCED
+        # Default to highest APY for supply/lend actions
+        if any(word in nl_lower for word in ["supply", "lend", "deposit", "stake"]):
+            strategy = Strategy.HIGHEST_APY
+        else:
+            strategy = Strategy.BALANCED
     
     # Parse duration (simplified)
     duration_days = 90  # Default 3 months

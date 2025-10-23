@@ -1,0 +1,41 @@
+🎯 Changes Made to Fix Auction Winner and Solver Names
+======================================================
+
+## Problem
+- Aave (Solver B) was winning even though it had lower APY (12.1%) than Morpho (13.2%)
+- Solver names were not clearly shown as Bob, Charlie, and Eve
+
+## Solution
+
+### 1. Fixed Strategy Detection (intent_parser_agent.py)
+- Made strategy detection more flexible to catch "highest APY" even when followed by other words
+- Changed default strategy for supply/lend/deposit/stake actions from BALANCED to HIGHEST_APY
+- Now detects:
+  - "highest" + ("apy" OR "return" OR "yield") → HIGHEST_APY
+  - Default for supply actions → HIGHEST_APY
+  
+### 2. Updated Solver Names (AuctionPanel.tsx)
+- Changed display names to clearly show solver identities:
+  - 0xSolverA → "👨‍💼 Solver Bob (Morpho)"
+  - 0xSolverB → "👨‍💼 Solver Charlie (Aave)"
+  - 0xSolverC → "👨‍💼 Solver Eve (Unqualified)"
+
+## Results
+✅ Morpho (Solver Bob) now wins with HIGHEST_APY strategy (13.2% > 12.1%)
+✅ Solver names clearly displayed as Bob, Charlie, Eve
+✅ Strategy detection works for:
+   - "Supply 500 USDC on Morpho with highest APY" → HIGHEST_APY
+   - "Supply 500 USDC on Morpho" → HIGHEST_APY (default)
+
+## Test Command
+curl -s "http://localhost:8787/submit-intent?nl=Supply%20500%20USDC%20on%20Morpho&user=0xAlice" \
+  | python3 -c "import sys, json; data = json.load(sys.stdin); \
+    winner = data['auction']['winner']; \
+    print('Winner:', winner['solver']); \
+    print('Protocol:', winner['plan']['protocol']); \
+    print('APY:', winner['claimed_apy_bps10']/10, '%')"
+
+Expected Output:
+Winner: 0xSolverA
+Protocol: morpho
+APY: 13.2 %
